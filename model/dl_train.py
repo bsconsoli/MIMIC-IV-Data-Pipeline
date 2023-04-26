@@ -76,7 +76,7 @@ class DL_models():
         self.loss=evaluation.Loss('cpu',True,True,True,True,True,True,True,True,True,True,True)
         if torch.cuda.is_available():
             self.device='cuda:0'
-        #self.device='cpu'
+        self.device='cpu'
         if train:
             print("===============MODEL TRAINING===============")
             self.dl_train()
@@ -283,35 +283,40 @@ class DL_models():
         stat_df=torch.zeros(size=(1,0))
         demo_df=torch.zeros(size=(1,0))
         y_df=[]
-        #print(ids)
+#         print("IDS",ids)
         dyn=pd.read_csv('./data/csv/'+str(ids[0])+'/dynamic.csv',header=[0,1])
         keys=dyn.columns.levels[0]
         for i in range(len(keys)):
             dyn_df.append(torch.zeros(size=(1,0)))
-#         print(len(dyn_df))
+#         print("HERE", len(dyn_df))
+#         print("KEYS", keys)
         for sample in ids:
             if self.data_icu:
                 y=labels[labels['stay_id']==sample]['label']
             else:
                 y=labels[labels['hadm_id']==sample]['label']
             y_df.append(int(y))
-            #print(sample)
+#             print("HERE",sample)
             dyn=pd.read_csv('./data/csv/'+str(sample)+'/dynamic.csv',header=[0,1])
-
+#             print("DYN", dyn)
+#             print("DYN headers",dyn.columns)
             for key in range(len(keys)):
-                dyn=dyn[keys[key]]
-                dyn=dyn.to_numpy()
-                dyn=torch.tensor(dyn)
+#                 print("LOOP", key)
+#                 print(keys[key])
+#                 print(dyn[keys[key]])
+                dyn_temp=dyn[keys[key]]
+                dyn_temp=dyn_temp.to_numpy()
+                dyn_temp=torch.tensor(dyn_temp)
                 #print(dyn.shape)
-                dyn=dyn.unsqueeze(0)
+                dyn_temp=dyn_temp.unsqueeze(0)
                 #print(dyn.shape)
-                dyn=torch.tensor(dyn)
-                dyn=dyn.type(torch.LongTensor)
+                dyn_temp=torch.tensor(dyn_temp)
+                dyn_temp=dyn_temp.type(torch.LongTensor)
                 
                 if dyn_df[key].nelement():
-                    dyn_df[key]=torch.cat((dyn_df[key],dyn),0)
+                    dyn_df[key]=torch.cat((dyn_df[key],dyn_temp),0)
                 else:
-                    dyn_df[key]=dyn
+                    dyn_df[key]=dyn_temp
             
                 #print(dyn_df[key].shape)        
             
@@ -321,7 +326,7 @@ class DL_models():
             stat=torch.tensor(stat)
             #print(dyn.shape)
             
-            if stat_df[key].nelement():
+            if stat_df.nelement():
                 stat_df=torch.cat((stat_df,stat),0)
             else:
                 stat_df=stat
@@ -339,7 +344,7 @@ class DL_models():
             #print(demo)
             demo=torch.tensor(demo)
             #print(dyn.shape)
-            if demo_df[key].nelement():
+            if demo_df.nelement():
                 demo_df=torch.cat((demo_df,demo),0)
             else:
                 demo_df=demo

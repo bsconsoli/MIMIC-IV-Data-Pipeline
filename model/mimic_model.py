@@ -92,9 +92,9 @@ class LSTMBase(nn.Module):
 #         if demo.shape[0]>self.batch_size:
 #             print(demo[0],demo[200],demo[400],demo[600],demo[800])
         if meds.shape[0]:
-            if med.shape[0]>self.batch_size:
-                med=med[-self.batch_size:]
-            medEmbedded=self.med(med)
+            if meds.shape[0]>self.batch_size:
+                meds=meds[-self.batch_size:]
+            medEmbedded=self.med(meds)
             
             if out1.nelement():
                 out1=torch.cat((out1,medEmbedded),2)
@@ -145,15 +145,15 @@ class LSTMBase(nn.Module):
         
 #         print("out",out1.shape)
         if conds.shape[0]>self.batch_size:
-                conds=conds[-self.batch_size:]
-        conds=conds.to(self.device)
-        condEmbed=self.cond(conds)
-        condEmbed=condEmbed.unsqueeze(1)
-        condEmbed=condEmbed.repeat(1,out1.shape[1],1)
-        condEmbed=condEmbed.type(torch.FloatTensor)
-        condEmbed=condEmbed.to(self.device)
-#         print("cond",condEmbed.shape)
-        out1=torch.cat((out1,condEmbed),2)
+            conds=conds[-self.batch_size:]
+            conds=conds.to(self.device)
+            condEmbed=self.cond(conds)
+            condEmbed=condEmbed.unsqueeze(1)
+            condEmbed=condEmbed.repeat(1,out1.shape[1],1)
+            condEmbed=condEmbed.type(torch.FloatTensor)
+            condEmbed=condEmbed.to(self.device)
+    #         print("cond",condEmbed.shape)
+            out1=torch.cat((out1,condEmbed),2)
 #         print("cond",condEmbed.shape)
         
 #         print("out",out1.shape)
